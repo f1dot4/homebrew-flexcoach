@@ -66,7 +66,8 @@ func newProfileGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cob
 			fmt.Printf("  • Birthdate: %v\n", data["birthdate"])
 			fmt.Printf("  • Sex:       %v\n", data["sex"])
 			fmt.Printf("  • Timezone:  %v\n", data["timezone"])
-			
+			fmt.Printf("  • Plan Time: %v\n", data["daily_plan_time"])
+			fmt.Printf("  • Insight Time: %v\n", data["weekly_insight_time"])
 			if data["weight_kg"] != nil || data["height_cm"] != nil || data["bmi"] != nil {
 				fmt.Println("\n⚖️ Body Vitals")
 				if weight, ok := data["weight_kg"].(float64); ok {

@@ -20,6 +20,7 @@ func NewPlanCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Com
 	cmd.AddCommand(newPlanModifyCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newPlanSkipCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newPlanListCmd(rootCfg, resolvedCtx))
+	cmd.AddCommand(newPlanActivateCmd(rootCfg, resolvedCtx))
 
 	return cmd
 }
@@ -73,6 +74,7 @@ func newPlanGenerateCmd(rootCfg **config.Config, resolvedCtx *config.Context) *c
 
 func newPlanListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	var asJSON bool
+	var statusFilter string
 
 	cmd := &cobra.Command{
 		Use:   "list",
@@ -101,20 +103,40 @@ func newPlanListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra
 				return nil
 			}
 
-			fmt.Printf("📋 Found %d training plans:\n\n", len(plans))
+			// Filter by status if requested
+			filteredPlans := []interface{}{}
+			if statusFilter != "" {
+				for _, p := range plans {
+					plan := p.(map[string]interface{})
+					if s, ok := plan["status"].(string); ok && s == statusFilter {
+						filteredPlans = append(filteredPlans, p)
+					}
+				}
+			} else {
+				filteredPlans = plans
+			}
+
+			if len(filteredPlans) == 0 {
+				fmt.Printf("No training plans found with status '%s'.\n", statusFilter)
+				return nil
+			}
+
+			fmt.Printf("📋 Found %d training plans:\n\n", len(filteredPlans))
 			fmt.Printf("%-36s | %-10s | %-10s | %-8s\n", "Plan ID", "Type", "Date", "Status")
 			fmt.Println("-------------------------------------+------------+------------+---------")
 
-			for _, p := range plans {
+			for _, p := range filteredPlans {
 				plan := p.(map[string]interface{})
 				planDate := "N/A"
-				if pd, ok := plan["plan_date"].(string); ok {
+				if pd, ok := plan["plan_date"].(string); ok && pd != "" {
 					planDate = pd[:10] // Just the date part
+				} else if sd, ok := plan["start_date"].(string); ok && sd != "" {
+					planDate = sd[:10]
 				}
-				fmt.Printf("%-36v | %-10v | %-10s | %-8v\n", 
-					plan["plan_id"], 
-					plan["plan_type"], 
-					planDate, 
+				fmt.Printf("%-36v | %-10v | %-10s | %-8v\n",
+					plan["plan_id"],
+					plan["plan_type"],
+					planDate,
 					plan["status"])
 			}
 
@@ -123,6 +145,7 @@ func newPlanListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra
 	}
 
 	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
+	cmd.Flags().StringVarP(&statusFilter, "status", "s", "", "Filter by status (active, scheduled, inactive)")
 	return cmd
 }
 
@@ -209,23 +232,25 @@ func newPlanGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.
 				}
 			}
 			fmt.Printf("Status: %s\n", status)
-			
+
 			if genTime, ok := plan["plan_create_datetime"].(string); ok {
 				fmt.Printf("Generated: %s\n", genTime)
 			}
-			
+
 			fmt.Println("\nActivities:")
 			activities, _ := plan["activities"].([]interface{})
 			for _, a := range activities {
 				act := a.(map[string]interface{})
 				fmt.Printf("  • %v (%vm): %v\n", act["sport_type"], act["duration_minutes"], act["user_description"])
-				
+
 				details := ""
 				if dist, ok := act["distance_km"].(float64); ok && dist > 0 {
 					details += fmt.Sprintf("%.1f km", dist)
 				}
 				if elev, ok := act["elevation_gain_meters"].(float64); ok && elev > 0 {
-					if details != "" { details += " | " }
+					if details != "" {
+						details += " | "
+					}
 					details += fmt.Sprintf("%.0f m ascent", elev)
 				}
 				if details != "" {
@@ -268,6 +293,37 @@ func newPlanSkipCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra
 	}
 
 	cmd.Flags().StringVar(&reason, "reason", "other", "Reason for skipping")
+	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
+	return cmd
+}
+
+func newPlanActivateCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
+	var asJSON bool
+
+	cmd := &cobra.Command{
+		Use:   "activate [plan-id]",
+		Short: "Manually activate a training plan",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+			planID := args[0]
+
+			path := fmt.Sprintf("/api/plans/%s/activate", planID)
+			resp, err := client.Request("POST", path, nil)
+			if err != nil {
+				return err
+			}
+
+			if asJSON {
+				fmt.Println(string(resp.Data))
+				return nil
+			}
+
+			fmt.Println(resp.Message)
+			return nil
+		},
+	}
+
 	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 	return cmd
 }

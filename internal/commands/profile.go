@@ -1,8 +1,11 @@
 package commands
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/f1dot4/flexcli/internal/api"
 	"github.com/f1dot4/flexcli/internal/config"
@@ -16,11 +19,49 @@ func NewProfileCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.
 	}
 
 	cmd.AddCommand(newProfileGetCmd(rootCfg, resolvedCtx))
+	cmd.AddCommand(newProfileDeleteCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newBodyCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewStatsCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewGoalCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewConstraintCmd(rootCfg, resolvedCtx))
 
+	return cmd
+}
+
+func newProfileDeleteCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
+	var force bool
+
+	cmd := &cobra.Command{
+		Use:   "delete",
+		Short: "Permanently delete user profile and all data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if !force {
+				fmt.Print("⚠️  WARNING: This will permanently delete all your data. This action is IRREVERSIBLE.\n")
+				fmt.Print("Are you sure you want to continue? (y/N): ")
+				reader := bufio.NewReader(os.Stdin)
+				response, err := reader.ReadString('\n')
+				if err != nil {
+					return err
+				}
+				response = strings.ToLower(strings.TrimSpace(response))
+				if response != "y" && response != "yes" {
+					fmt.Println("Aborted.")
+					return nil
+				}
+			}
+
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+			resp, err := client.Request("DELETE", "/api/profile", nil)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("✅ %s\n", resp.Message)
+			return nil
+		},
+	}
+
+	cmd.Flags().BoolVar(&force, "force", false, "Skip confirmation prompt")
 	return cmd
 }
 
@@ -75,20 +116,20 @@ func newProfileGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cob
 				} else if data["weight_kg"] != nil {
 					fmt.Printf("  • Weight:    %v kg (type: %T)\n", data["weight_kg"], data["weight_kg"])
 				}
-				
+
 				if height, ok := data["height_cm"].(float64); ok {
 					fmt.Printf("  • Height:    %.0f cm\n", height)
 				} else if data["height_cm"] != nil {
 					fmt.Printf("  • Height:    %v cm (type: %T)\n", data["height_cm"], data["height_cm"])
 				}
-				
+
 				if bmi, ok := data["bmi"].(float64); ok {
 					fmt.Printf("  • BMI:       %.1f\n", bmi)
 				} else if data["bmi"] != nil {
 					fmt.Printf("  • BMI:       %v (type: %T)\n", data["bmi"], data["bmi"])
 				}
 			}
-			
+
 			return nil
 		},
 	}

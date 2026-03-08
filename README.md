@@ -17,6 +17,14 @@ You can install FlexCLI via Homebrew:
 brew install f1dot4/flexcli/flexcli
 ```
 
+### Building from Source
+
+To build the `flexcli` binary from the source code:
+
+```bash
+# From the root of the flexcli repository
+go build -o flexcli ./cmd/flexcli
+```
 
 ## Development
 ```bash

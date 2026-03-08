@@ -10,10 +10,13 @@ FlexCLI is the command-line interface for the FlexCoach platform.
 - Statistics viewing
 
 ## Installation
+
+You can install FlexCLI via Homebrew:
+
 ```bash
-brew install f1dot4/flexcoach/flexcli
+brew install f1dot4/flexcli/flexcli
 ```
-(Installation instructions will be updated once the tap is ready)
+
 
 ## Development
 ```bash

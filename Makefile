@@ -25,7 +25,7 @@ release:
 	@SHA=$$(sha256sum /tmp/flexcli-v$(v).tar.gz | cut -d' ' -f1); \
 	sed -i '' "s/sha256 \".*\"/sha256 \"$$SHA\"/" Formula/flexcli.rb
 	@rm /tmp/flexcli-v$(v).tar.gz
-	@git add cmd/flexcli/main.go Formula/flexcli.rb bin/
+	@git add -f cmd/flexcli/main.go Formula/flexcli.rb bin/
 	@git commit -m "chore: release v$(v)"
 	@git tag v$(v)
 	@echo "Release v$(v) committed and tagged locally. Run 'git push origin main && git push origin v$(v)' to publish."

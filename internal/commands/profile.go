@@ -20,6 +20,7 @@ func NewProfileCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.
 
 	cmd.AddCommand(newProfileGetCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newProfileDeleteCmd(rootCfg, resolvedCtx))
+	cmd.AddCommand(newProfileInsightsCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newBodyCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newPreferencesCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewStatsCmd(rootCfg, resolvedCtx))
@@ -339,6 +340,61 @@ func newPreferencesSetCmd(rootCfg **config.Config, resolvedCtx *config.Context) 
 	cmd.Flags().StringVar(&timezone, "timezone", "", "Timezone (e.g., Europe/Vienna)")
 	cmd.Flags().StringVar(&planTime, "plan-time", "", "Daily plan delivery time (e.g., 19:30)")
 	cmd.Flags().StringVar(&insightTime, "insight-time", "", "Weekly insight delivery time (e.g., Sunday 18:00)")
+	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
+
+	return cmd
+}
+
+func newProfileInsightsCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
+	var force bool
+	var asJSON bool
+
+	cmd := &cobra.Command{
+		Use:   "insights",
+		Short: "View latest AI coaching insights",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+
+			path := "/api/profile/insights"
+			if force {
+				path += "?force=true"
+			}
+
+			resp, err := client.Request("GET", path, nil)
+			if err != nil {
+				return err
+			}
+
+			if asJSON {
+				fmt.Println(string(resp.Data))
+				return nil
+			}
+
+			var data map[string]interface{}
+			if err := json.Unmarshal(resp.Data, &data);
+			err != nil {
+				return err
+			}
+
+			fmt.Println("🤖 AI Coaching Insights")
+			
+			insight, _ := data["insight"].(string)
+			cached, _ := data["cached"].(bool)
+			createdAt, _ := data["created_at"].(string)
+
+			if cached {
+				fmt.Printf("   (Cached from %v)\n", createdAt)
+			} else {
+				fmt.Printf("   (Generated at %v)\n", createdAt)
+			}
+			fmt.Println()
+			fmt.Printf("%v\n", insight)
+
+			return nil
+		},
+	}
+
+	cmd.Flags().BoolVar(&force, "force", false, "Force regeneration of insights")
 	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 
 	return cmd

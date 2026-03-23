@@ -27,8 +27,8 @@ release: test docs
 	@# Update version in Formula (placeholder SHA for now)
 	@sed -i '' 's|url ".*tags/v.*.tar.gz"|url "https://github.com/f1dot4/homebrew-flexcli/archive/refs/tags/v$(v).tar.gz"|' Formula/flexcli.rb
 	@sed -i '' 's/sha256 ".*"/sha256 "PLACEHOLDER"/' Formula/flexcli.rb
-	@# Rebuild to ensure binary matches and docs are fresh
-	@$(MAKE) build
+	@# Rebuild with explicit version so LDFLAGS reflect the release tag, not git-describe
+	@$(MAKE) build VERSION=v$(v)
 	@git add -f cmd/flexcli/main.go Formula/flexcli.rb bin/
 	@git commit -m "chore: release v$(v)"
 	@git tag v$(v)

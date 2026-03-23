@@ -29,7 +29,7 @@ release: test docs
 	@sed -i '' 's/sha256 ".*"/sha256 "PLACEHOLDER"/' Formula/flexcli.rb
 	@# Rebuild with explicit version so LDFLAGS reflect the release tag, not git-describe
 	@$(MAKE) build VERSION=v$(v)
-	@git add -f cmd/flexcli/main.go Formula/flexcli.rb bin/
+	@git add -f cmd/flexcli/main.go Formula/flexcli.rb bin/ docs/CLI_REFERENCE.md
 	@git commit -m "chore: release v$(v)"
 	@git tag v$(v)
 	@echo "Pushing tag to GitHub to generate archive..."

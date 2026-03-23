@@ -122,7 +122,7 @@ func newPlanListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra
 			}
 
 			fmt.Printf("📋 Found %d training plans:\n\n", len(filteredPlans))
-			fmt.Printf("%-36s | %-10s | %-10s | %-8s\n", "Plan ID", "Type", "Date", "Status")
+			fmt.Printf("%-36s | %-10s | %-10s | %s\n", "Plan ID", "Type", "Date", "Status")
 			fmt.Println("-------------------------------------+------------+------------+---------")
 
 			for _, p := range filteredPlans {
@@ -133,11 +133,15 @@ func newPlanListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra
 				} else if sd, ok := plan["start_date"].(string); ok && sd != "" {
 					planDate = sd[:10]
 				}
-				fmt.Printf("%-36v | %-10v | %-10s | %-8v\n",
+				status := fmt.Sprintf("%v", plan["status"])
+				if reason, ok := plan["skip_reason"].(string); ok && reason != "" {
+					status = fmt.Sprintf("%s [%s]", status, reason)
+				}
+				fmt.Printf("%-36v | %-10v | %-10s | %s\n",
 					plan["plan_id"],
 					plan["plan_type"],
 					planDate,
-					plan["status"])
+					status)
 			}
 
 			return nil

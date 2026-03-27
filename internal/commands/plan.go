@@ -258,14 +258,25 @@ func newPlanGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.
 					details += fmt.Sprintf("%.0f m ascent", elev)
 				}
 				if details != "" {
-					fmt.Printf("    • %s\n", details)
+				        fmt.Printf("    • %s\n", details)
 				}
-			}
 
-			return nil
-		},
-	}
+				if routes, ok := act["suggested_routes"].([]interface{}); ok && len(routes) > 0 {
+				        fmt.Println("    📍 Suggested Routes:")
+				        for _, r := range routes {
+				                route := r.(map[string]interface{})
+				                fmt.Printf("      • %v (%.1f km, %v m) - %v\n",
+				                        route["name"],
+				                        route["distance_km"],
+				                        route["ascent_meters"],
+				                        route["url"])
+				        }
+				}
+				}
 
+				return nil
+				},
+				}
 	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 	return cmd
 }

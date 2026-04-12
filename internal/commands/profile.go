@@ -26,7 +26,7 @@ func NewProfileCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.
 	cmd.AddCommand(NewStatsCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewGoalCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewConstraintCmd(rootCfg, resolvedCtx))
-        cmd.AddCommand(NewReportCmd(rootCfg, resolvedCtx))
+        
 
 	return cmd
 }

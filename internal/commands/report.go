@@ -73,7 +73,7 @@ func newReportListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cob
 					report["report_id"].(string)[:8])
 			}
 
-			fmt.Println("\nRun 'flexcli profile report show <id>' to see detailed results.")
+			fmt.Println("\nRun 'flexcli profile stats report show <id>' to see detailed results.")
 			return nil
 		},
 	}

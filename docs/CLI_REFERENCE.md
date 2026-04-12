@@ -828,7 +828,6 @@ Available Commands:
   goal        Manage training goals
   insights    View latest AI coaching insights
   preferences Manage user preferences (timezone, plan time, insight time)
-  report      View training reports
   stats       View training statistics and reports
 
 Flags:
@@ -1309,68 +1308,6 @@ Global Flags:
       --server string    FlexCoach server URL override
 ```
 
-### `flexcli profile report`
-
-```
-View training reports
-
-Usage:
-  flexcli profile report [command]
-
-Available Commands:
-  list        List recent training reports
-  show        Show detailed training report
-
-Flags:
-  -h, --help   help for report
-
-Global Flags:
-      --config string    config file (default is $HOME/.flexcli.json)
-      --context string   Use specific context from config
-      --key string       FlexCoach API key override
-      --server string    FlexCoach server URL override
-
-Use "flexcli profile report [command] --help" for more information about a command.
-```
-
-### `flexcli profile report list`
-
-```
-List recent training reports
-
-Usage:
-  flexcli profile report list [flags]
-
-Flags:
-  -h, --help   help for list
-      --json   Output in JSON format
-
-Global Flags:
-      --config string    config file (default is $HOME/.flexcli.json)
-      --context string   Use specific context from config
-      --key string       FlexCoach API key override
-      --server string    FlexCoach server URL override
-```
-
-### `flexcli profile report show`
-
-```
-Show detailed training report
-
-Usage:
-  flexcli profile report show [report-id] [flags]
-
-Flags:
-  -h, --help   help for show
-      --json   Output in JSON format
-
-Global Flags:
-      --config string    config file (default is $HOME/.flexcli.json)
-      --context string   Use specific context from config
-      --key string       FlexCoach API key override
-      --server string    FlexCoach server URL override
-```
-
 ### `flexcli profile stats`
 
 ```
@@ -1380,7 +1317,9 @@ Usage:
   flexcli profile stats [command]
 
 Available Commands:
-  dashboard   View training dashboard
+  dashboard    View training dashboard
+  healthtrends View health trends (7d vs 30d)
+  report       View training reports
 
 Flags:
   -h, --help   help for stats
@@ -1404,6 +1343,91 @@ Usage:
 
 Flags:
   -h, --help   help for dashboard
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats healthtrends`
+
+```
+View health trends (7d vs 30d)
+
+Usage:
+  flexcli profile stats healthtrends [flags]
+
+Aliases:
+  healthtrends, health
+
+Flags:
+  -d, --days int   Lookback days for trend analysis (default 30)
+  -h, --help       help for healthtrends
+      --json       Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats report`
+
+```
+View training reports
+
+Usage:
+  flexcli profile stats report [command]
+
+Available Commands:
+  list        List recent training reports
+  show        Show detailed training report
+
+Flags:
+  -h, --help   help for report
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+
+Use "flexcli profile stats report [command] --help" for more information about a command.
+```
+
+### `flexcli profile stats report list`
+
+```
+List recent training reports
+
+Usage:
+  flexcli profile stats report list [flags]
+
+Flags:
+  -h, --help   help for list
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats report show`
+
+```
+Show detailed training report
+
+Usage:
+  flexcli profile stats report show [report-id] [flags]
+
+Flags:
+  -h, --help   help for show
       --json   Output in JSON format
 
 Global Flags:

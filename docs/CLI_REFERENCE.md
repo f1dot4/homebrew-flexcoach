@@ -1062,6 +1062,7 @@ Available Commands:
   delete      Delete an activity from Garmin Connect (currently disabled)
   download    Download an activity's original FIT file from Garmin Connect
   list        List synced activities with their Garmin activity IDs
+  rename      Rename an activity in Garmin Connect
   upload      Upload a FIT/GPX/TCX file to Garmin Connect
 
 Flags:
@@ -1126,6 +1127,24 @@ Flags:
       --json            Output as JSON
       --page int        Page number (default 1)
       --page-size int   Number of activities per page (default 20)
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile data activity rename`
+
+```
+Rename an activity in Garmin Connect
+
+Usage:
+  flexcli profile data activity rename <activity_id> <title> [flags]
+
+Flags:
+  -h, --help   help for rename
 
 Global Flags:
       --config string    config file (default is $HOME/.flexcli.json)

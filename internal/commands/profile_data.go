@@ -108,6 +108,7 @@ func newDataActivityCmd(rootCfg **config.Config, resolvedCtx *config.Context) *c
 	cmd.AddCommand(newDataActivityDownloadCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newDataActivityUploadCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newDataActivityDeleteCmd(rootCfg, resolvedCtx))
+	cmd.AddCommand(newDataActivityRenameCmd(rootCfg, resolvedCtx))
 
 	return cmd
 }
@@ -412,6 +413,37 @@ func newDataHealthMetricDeleteCmd(rootCfg **config.Config, resolvedCtx *config.C
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Health metric deletion is currently not implemented due to safety reasons.")
 			fmt.Println("Please remove records manually if absolutely necessary.")
+			return nil
+		},
+	}
+}
+
+func newDataActivityRenameCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
+	return &cobra.Command{
+		Use:   "rename <activity_id> <title>",
+		Short: "Rename an activity in Garmin Connect",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			activityID := args[0]
+			title := args[1]
+
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+
+			body := map[string]string{
+				"name": title,
+			}
+
+			path := fmt.Sprintf("/api/activity/%s/name", activityID)
+			resp, err := client.Request("PUT", path, body)
+			if err != nil {
+				return fmt.Errorf("rename failed: %w", err)
+			}
+
+			if resp.Success {
+				fmt.Printf("✅ Activity %s renamed to: %s\n", activityID, title)
+			} else {
+				fmt.Printf("❌ Rename failed: %s\n", resp.Message)
+			}
 			return nil
 		},
 	}

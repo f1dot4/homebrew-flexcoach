@@ -49,18 +49,38 @@ func newDataSyncGarminCmd(rootCfg **config.Config, resolvedCtx *config.Context) 
 		Short: "Sync data from Garmin Connect",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
-			resp, err := client.Request("POST", "/api/sync/garmin", nil)
+			events, err := client.PostSSE("/api/sync/garmin/stream")
 			if err != nil {
 				return err
 			}
 
-			if resp.Success {
-				fmt.Println("✅ Garmin synchronization triggered successfully.")
-				if resp.Message != "" && resp.Message != "Garmin sync triggered" {
-					fmt.Printf("Details: %s\n", resp.Message)
+			var syncSuccess bool
+			var finalError string
+
+			for event := range events {
+				if event.Event == "result" {
+					var result struct {
+						Success bool   `json:"success"`
+						Error   string `json:"error"`
+					}
+					if err := json.Unmarshal([]byte(event.Data), &result); err == nil {
+						syncSuccess = result.Success
+						finalError = result.Error
+					}
+				} else {
+					fmt.Printf("🔄 %s\n", event.Data)
 				}
+			}
+
+			if syncSuccess {
+				fmt.Println("✅ Garmin synchronization complete.")
 			} else {
-				fmt.Printf("❌ Garmin synchronization failed: %s\n", resp.Message)
+				if finalError != "" {
+					fmt.Printf("❌ Garmin synchronization failed: %s\n", finalError)
+				} else {
+					fmt.Println("❌ Garmin synchronization failed.")
+				}
+				return fmt.Errorf("sync failed")
 			}
 
 			return nil
@@ -74,25 +94,44 @@ func newDataSyncWithingsCmd(rootCfg **config.Config, resolvedCtx *config.Context
 		Short: "Sync data from Withings",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
-			resp, err := client.Request("POST", "/api/sync/withings", nil)
+			events, err := client.PostSSE("/api/sync/withings/stream")
 			if err != nil {
 				return err
 			}
 
-			if resp.Success {
-				fmt.Println("✅ Withings synchronization triggered successfully.")
-				if resp.Message != "" && resp.Message != "Withings sync triggered" {
-					fmt.Printf("Details: %s\n", resp.Message)
+			var syncSuccess bool
+			var finalError string
+
+			for event := range events {
+				if event.Event == "result" {
+					var result struct {
+						Success bool   `json:"success"`
+						Error   string `json:"error"`
+					}
+					if err := json.Unmarshal([]byte(event.Data), &result); err == nil {
+						syncSuccess = result.Success
+						finalError = result.Error
+					}
+				} else {
+					fmt.Printf("🔄 %s\n", event.Data)
 				}
+			}
+
+			if syncSuccess {
+				fmt.Println("✅ Withings synchronization complete.")
 			} else {
-				fmt.Printf("❌ Withings synchronization failed: %s\n", resp.Message)
+				if finalError != "" {
+					fmt.Printf("❌ Withings synchronization failed: %s\n", finalError)
+				} else {
+					fmt.Println("❌ Withings synchronization failed.")
+				}
+				return fmt.Errorf("sync failed")
 			}
 
 			return nil
 		},
 	}
 }
-
 // ---------------------------------------------------------------------------
 // data activity (alias: act)
 // ---------------------------------------------------------------------------

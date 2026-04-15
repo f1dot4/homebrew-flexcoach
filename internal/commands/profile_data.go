@@ -158,22 +158,16 @@ func newDataActivityListCmd(rootCfg **config.Config, resolvedCtx *config.Context
 			}
 
 			fmt.Printf("Activities (page %d/%d, %d total):\n\n", data.CurrentPage, data.TotalPages, data.TotalEntries)
-			fmt.Printf("  %-16s  %-20s  %-10s  %6s  %s\n", "GARMIN ID", "DATE", "TYPE", "MIN", "DESCRIPTION")
-			fmt.Printf("  %-16s  %-20s  %-10s  %6s  %s\n", "────────────────", "────────────────────", "──────────", "──────", "───────────")
+			fmt.Printf("  %-16s  %-20s  %-22s  %6s  %s\n", "GARMIN ID", "DATE", "TYPE", "MIN", "DESCRIPTION")
+			fmt.Printf("  %-16s  %-20s  %-22s  %6s  %s\n", "────────────────", "────────────────────", "──────────────────────", "──────", "───────────")
 			for _, a := range data.Activities {
 				dateStr := a.StartTime
 				if len(dateStr) > 16 {
 					dateStr = dateStr[:16]
 				}
 				actType := strings.Replace(a.Type, "_", " ", -1)
-				if len(actType) > 10 {
-					actType = actType[:10]
-				}
 				desc := a.Description
-				if len(desc) > 30 {
-					desc = desc[:27] + "..."
-				}
-				fmt.Printf("  %-16s  %-20s  %-10s  %6d  %s\n", a.GarminActivityID, dateStr, actType, a.DurationMinutes, desc)
+				fmt.Printf("  %-16s  %-20s  %-22s  %6d  %s\n", a.GarminActivityID, dateStr, actType, a.DurationMinutes, desc)
 			}
 
 			return nil

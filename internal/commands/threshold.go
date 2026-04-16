@@ -3,9 +3,11 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
 
-	"github.com/f1dot4/flexcli/internal/api"
-	"github.com/f1dot4/flexcli/internal/config"
+	"github.com/f1dot4/flexcoach/flexcli/internal/api"
+	"github.com/f1dot4/flexcoach/flexcli/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -45,60 +47,98 @@ func newThresholdGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *c
 				return err
 			}
 
-			if data["thresholds"] == nil {
+			if data["data"] == nil || data["data"].(map[string]interface{})["thresholds"] == nil {
 				fmt.Println("No thresholds found.")
 				return nil
 			}
 
-			thresholds := data["thresholds"].(map[string]interface{})
+			thresholds := data["data"].(map[string]interface{})["thresholds"].(map[string]interface{})
+			lastSeenDates := make(map[string]time.Time)
+			if lsd, ok := thresholds["last_seen_dates"].(map[string]interface{}); ok {
+				for k, v := range lsd {
+					if dateStr, ok := v.(string); ok {
+						t, _ := time.Parse("2006-01-02", dateStr)
+						lastSeenDates[k] = t
+					}
+				}
+			}
+
 			fmt.Println("📊 Current Training Thresholds")
 			fmt.Println("------------------------------")
 
+			today := time.Now()
+			
 			// Helper to get status hint
-			getHint := func(isLearned, isDerived interface{}) string {
+			getHint := func(metricName string, isLearned, isDerived interface{}) string {
+				hint := ""
 				if il, ok := isLearned.(bool); ok && il {
-					return " 📈"
+					hint += " 📈"
+				} else if id, ok := isDerived.(bool); ok && id {
+					hint += " 🔢"
 				}
-				if id, ok := isDerived.(bool); ok && id {
-					return " 🔢"
+				
+				if lastSeen, ok := lastSeenDates[metricName]; ok {
+					if today.Sub(lastSeen).Hours() > 24*30 {
+						hint += " ⚠️"
+					}
 				}
-				return ""
+				return hint
+			}
+
+			formatValue := func(val, calc interface{}, unit string) string {
+				s := fmt.Sprintf("%v", val)
+				if s == "<nil>" || s == "" {
+					s = "N/A"
+				} else if unit != "" {
+					s += " " + unit
+				}
+				
+				if calc != nil && (val == nil || fmt.Sprintf("%v", val) == "<nil>" || fmt.Sprintf("%v", val) == "") {
+					calcStr := fmt.Sprintf("%v", calc)
+					if unit != "" {
+						calcStr += " " + unit
+					}
+					s += fmt.Sprintf(" 🔢 (Calc: %s)", calcStr)
+				}
+				return s
 			}
 
 			fmt.Println("Running:")
-			fmt.Printf("  • FTP:   %v W%s\n", thresholds["effective_running_ftp"], getHint(thresholds["is_running_ftp_learned"], thresholds["is_running_ftp_derived"]))
-			fmt.Printf("  • LTHR:  %v bpm%s\n", thresholds["effective_running_lthr"], getHint(thresholds["is_running_lthr_learned"], thresholds["is_running_lthr_derived"]))
-			fmt.Printf("  • Pace:  %v%s\n", thresholds["effective_running_threshold_pace"], getHint(thresholds["is_running_pace_learned"], nil))
+			fmt.Printf("  • FTP:   %s%s\n", 
+				formatValue(thresholds["running_ftp"], thresholds["effective_running_ftp"], "W"),
+				getHint("running_ftp", thresholds["is_running_ftp_learned"], thresholds["is_running_ftp_derived"]))
+			
+			fmt.Printf("  • LTHR:  %s%s\n", 
+				formatValue(thresholds["running_lthr"], thresholds["effective_running_lthr"], "bpm"),
+				getHint("running_lthr", thresholds["is_running_lthr_learned"], thresholds["is_running_lthr_derived"]))
+			
+			fmt.Printf("  • Pace:  %s%s\n", 
+				formatValue(thresholds["running_threshold_pace"], thresholds["effective_running_threshold_pace"], ""),
+				getHint("running_threshold_pace", thresholds["is_running_pace_learned"], nil))
 
 			fmt.Println("\nCycling:")
-			fmt.Printf("  • FTP:   %v W%s\n", thresholds["effective_cycling_ftp"], getHint(thresholds["is_cycling_ftp_learned"], thresholds["is_cycling_ftp_derived"]))
-			fmt.Printf("  • LTHR:  %v bpm%s\n", thresholds["effective_cycling_lthr"], getHint(thresholds["is_cycling_lthr_learned"], thresholds["is_cycling_lthr_derived"]))
-			fmt.Printf("  • Pace:  %v%s\n", thresholds["effective_cycling_threshold_pace"], getHint(thresholds["is_cycling_pace_learned"], thresholds["is_cycling_pace_derived"]))
+			fmt.Printf("  • FTP:   %s%s\n", 
+				formatValue(thresholds["cycling_ftp"], thresholds["effective_cycling_ftp"], "W"),
+				getHint("cycling_ftp", thresholds["is_cycling_ftp_learned"], thresholds["is_cycling_ftp_derived"]))
+			
+			fmt.Printf("  • LTHR:  %s%s\n", 
+				formatValue(thresholds["cycling_lthr"], thresholds["effective_cycling_lthr"], "bpm"),
+				getHint("cycling_lthr", thresholds["is_cycling_lthr_learned"], thresholds["is_cycling_lthr_derived"]))
+			
+			fmt.Printf("  • Pace:  %s%s\n", 
+				formatValue(thresholds["cycling_threshold_pace"], thresholds["effective_cycling_threshold_pace"], ""),
+				getHint("cycling_threshold_pace", thresholds["is_cycling_pace_learned"], thresholds["is_cycling_pace_derived"]))
 
-			hasLearned := false
-			hasDerived := false
-			for k, v := range thresholds {
-				if k[len(k)-7:] == "learned" {
-					if b, ok := v.(bool); ok && b {
-						hasLearned = true
-					}
-				}
-				if k[len(k)-7:] == "derived" {
-					if b, ok := v.(bool); ok && b {
-						hasDerived = true
-					}
-				}
-			}
-
-			if hasLearned || hasDerived {
-				fmt.Println("")
-				if hasLearned {
-					fmt.Println("📈 = learned from history")
-				}
-				if hasDerived {
-					fmt.Println("🔢 = calculated via formula")
-				}
-			}
+			hints := []string{}
+			output := fmt.Sprintf("%v", thresholds) // Just to check for hint chars in output string
+			// We can do it more reliably by checking the hints we actually used
+			hasLearned := strings.Contains(output, "true") // Simplified check for flags
+			
+			// Always show legend if metrics exist
+			fmt.Println("\nLegend:")
+			fmt.Println("  📈 = learned from history")
+			fmt.Println("  🔢 = calculated via formula")
+			fmt.Println("  ⚠️  = stale (not seen in 30 days)")
 
 			return nil
 		},

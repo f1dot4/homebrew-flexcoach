@@ -1248,7 +1248,7 @@ Usage:
 
 Flags:
   -h, --help   help for show
-      --json   Output as JSON
+      --json   Output in JSON format
 
 Global Flags:
       --config string    config file (default is $HOME/.flexcli.json)

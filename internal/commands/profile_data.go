@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewProfileDataCmd builds the \`profile data\` command tree, grouping
+// NewProfileDataCmd builds the profile data command tree, grouping
 // manual sync, imported activities, and imported health metrics.
 func NewProfileDataCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	cmd := &cobra.Command{
@@ -182,10 +182,10 @@ func newDataActivityListCmd(rootCfg **config.Config, resolvedCtx *config.Context
 					StartTime        string   `json:"start_time"`
 					DurationMinutes  int      `json:"duration_minutes"`
 					DistanceKm       *float64 `json:"distance_km"`
-				} \`json:\"activities\"\`
-				TotalEntries int \`json:\"total_entries\"\`
-				TotalPages   int \`json:\"total_pages\"\`
-				CurrentPage  int \`json:\"current_page\"\`
+				} `json:"activities"`
+				TotalEntries int `json:"total_entries"`
+				TotalPages   int `json:"total_pages"`
+				CurrentPage  int `json:"current_page"`
 			}
 			if err := json.Unmarshal(resp.Data, &data); err != nil {
 				return fmt.Errorf("failed to parse response: %w", err)
@@ -335,21 +335,21 @@ func newDataHealthMetricListCmd(rootCfg **config.Config, resolvedCtx *config.Con
 
 			var data struct {
 				Metrics []struct {
-					ID                int      \`json:\"id\"\`
-					Date              string   \`json:\"date\"\`
-					Source            string   \`json:\"source\"\`
-					WeightKg          *float64 \`json:\"weight_kg\"\`
-					RestingHeartRate  *int     \`json:\"resting_heart_rate\"\`
-					HRVScore          *float64 \`json:\"hrv_score\"\`
-					SleepHours        *float64 \`json:\"sleep_hours\"\`
-					CyclingFTP        *float64 \`json:\"cycling_ftp\"\`
-					CyclingLTHR       *float64 \`json:\"cycling_lthr\"\`
-					RunningFTP        *float64 \`json:\"running_ftp\"\`
-					RunningLTHR       *float64 \`json:\"running_lthr\"\`
-				} \`json:\"metrics\"\`
-				TotalEntries int \`json:\"total_entries\"\`
-				TotalPages   int \`json:\"total_pages\"\`
-				CurrentPage  int \`json:\"current_page\"\`
+					ID                int      `json:"id"`
+					Date              string   `json:"date"`
+					Source            string   `json:"source"`
+					WeightKg          *float64 `json:"weight_kg"`
+					RestingHeartRate  *int     `json:"resting_heart_rate"`
+					HRVScore          *float64 `json:"hrv_score"`
+					SleepHours        *float64 `json:"sleep_hours"`
+					CyclingFTP        *float64 `json:"cycling_ftp"`
+					CyclingLTHR       *float64 `json:"cycling_lthr"`
+					RunningFTP        *float64 `json:"running_ftp"`
+					RunningLTHR       *float64 `json:"running_lthr"`
+				} `json:"metrics"`
+				TotalEntries int `json:"total_entries"`
+				TotalPages   int `json:"total_pages"`
+				CurrentPage  int `json:"current_page"`
 			}
 			if err := json.Unmarshal(resp.Data, &data); err != nil {
 				return fmt.Errorf("failed to parse response: %w", err)

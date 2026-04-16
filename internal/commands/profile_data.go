@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewProfileDataCmd builds the `profile data` command tree, grouping
+// NewProfileDataCmd builds the \`profile data\` command tree, grouping
 // manual sync, imported activities, and imported health metrics.
 func NewProfileDataCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	cmd := &cobra.Command{
@@ -182,10 +182,10 @@ func newDataActivityListCmd(rootCfg **config.Config, resolvedCtx *config.Context
 					StartTime        string   `json:"start_time"`
 					DurationMinutes  int      `json:"duration_minutes"`
 					DistanceKm       *float64 `json:"distance_km"`
-				} `json:"activities"`
-				TotalEntries int `json:"total_entries"`
-				TotalPages   int `json:"total_pages"`
-				CurrentPage  int `json:"current_page"`
+				} \`json:\"activities\"\`
+				TotalEntries int \`json:\"total_entries\"\`
+				TotalPages   int \`json:\"total_pages\"\`
+				CurrentPage  int \`json:\"current_page\"\`
 			}
 			if err := json.Unmarshal(resp.Data, &data); err != nil {
 				return fmt.Errorf("failed to parse response: %w", err)
@@ -335,18 +335,21 @@ func newDataHealthMetricListCmd(rootCfg **config.Config, resolvedCtx *config.Con
 
 			var data struct {
 				Metrics []struct {
-					ID                int      `json:"id"`
-					Date              string   `json:"date"`
-					Source            string   `json:"source"`
-					WeightKg          *float64 `json:"weight_kg"`
-					RestingHeartRate  *int     `json:"resting_heart_rate"`
-					HRVScore          *float64 `json:"hrv_score"`
-					BodyBattery       *int     `json:"body_battery"`
-					SleepHours        *float64 `json:"sleep_hours"`
-				} `json:"metrics"`
-				TotalEntries int `json:"total_entries"`
-				TotalPages   int `json:"total_pages"`
-				CurrentPage  int `json:"current_page"`
+					ID                int      \`json:\"id\"\`
+					Date              string   \`json:\"date\"\`
+					Source            string   \`json:\"source\"\`
+					WeightKg          *float64 \`json:\"weight_kg\"\`
+					RestingHeartRate  *int     \`json:\"resting_heart_rate\"\`
+					HRVScore          *float64 \`json:\"hrv_score\"\`
+					SleepHours        *float64 \`json:\"sleep_hours\"\`
+					CyclingFTP        *float64 \`json:\"cycling_ftp\"\`
+					CyclingLTHR       *float64 \`json:\"cycling_lthr\"\`
+					RunningFTP        *float64 \`json:\"running_ftp\"\`
+					RunningLTHR       *float64 \`json:\"running_lthr\"\`
+				} \`json:\"metrics\"\`
+				TotalEntries int \`json:\"total_entries\"\`
+				TotalPages   int \`json:\"total_pages\"\`
+				CurrentPage  int \`json:\"current_page\"\`
 			}
 			if err := json.Unmarshal(resp.Data, &data); err != nil {
 				return fmt.Errorf("failed to parse response: %w", err)
@@ -358,10 +361,10 @@ func newDataHealthMetricListCmd(rootCfg **config.Config, resolvedCtx *config.Con
 			}
 
 			fmt.Printf("Health metrics (page %d/%d, %d total):\n\n", data.CurrentPage, data.TotalPages, data.TotalEntries)
-			fmt.Printf("  %-6s  %-12s  %-12s  %8s  %5s  %5s  %4s  %5s\n",
-				"ID", "DATE", "SOURCE", "WEIGHT", "RHR", "HRV", "BB", "SLEEP")
-			fmt.Printf("  %-6s  %-12s  %-12s  %8s  %5s  %5s  %4s  %5s\n",
-				"──────", "──────────", "──────────", "────────", "─────", "─────", "────", "─────")
+			fmt.Printf("  %-12s  %-10s  %8s  %5s  %5s  %5s  %6s  %6s  %6s  %6s\n",
+				"DATE", "SOURCE", "WEIGHT", "RHR", "HRV", "SLEEP", "C-FTP", "C-LTHR", "R-FTP", "R-LTHR")
+			fmt.Printf("  %-12s  %-10s  %8s  %5s  %5s  %5s  %6s  %6s  %6s  %6s\n",
+				"──────────", "──────────", "────────", "─────", "─────", "─────", "──────", "──────", "──────", "──────")
 			for _, m := range data.Metrics {
 				weight := "  -"
 				if m.WeightKg != nil {
@@ -375,16 +378,28 @@ func newDataHealthMetricListCmd(rootCfg **config.Config, resolvedCtx *config.Con
 				if m.HRVScore != nil {
 					hrv = fmt.Sprintf("%5.1f", *m.HRVScore)
 				}
-				bb := "  -"
-				if m.BodyBattery != nil {
-					bb = fmt.Sprintf("%4d", *m.BodyBattery)
-				}
 				sleep := "  -"
 				if m.SleepHours != nil {
 					sleep = fmt.Sprintf("%5.1f", *m.SleepHours)
 				}
-				fmt.Printf("  %-6d  %-12s  %-12s  %8s  %5s  %5s  %4s  %5s\n",
-					m.ID, m.Date, m.Source, weight, rhr, hrv, bb, sleep)
+				cftp := "  -"
+				if m.CyclingFTP != nil {
+					cftp = fmt.Sprintf("%6.0f", *m.CyclingFTP)
+				}
+				clthr := "  -"
+				if m.CyclingLTHR != nil {
+					clthr = fmt.Sprintf("%6.0f", *m.CyclingLTHR)
+				}
+				rftp := "  -"
+				if m.RunningFTP != nil {
+					rftp = fmt.Sprintf("%6.0f", *m.RunningFTP)
+				}
+				rlthr := "  -"
+				if m.RunningLTHR != nil {
+					rlthr = fmt.Sprintf("%6.0f", *m.RunningLTHR)
+				}
+				fmt.Printf("  %-12s  %-10s  %8s  %5s  %5s  %5s  %6s  %6s  %6s  %6s\n",
+					m.Date, m.Source, weight, rhr, hrv, sleep, cftp, clthr, rftp, rlthr)
 			}
 
 			return nil
@@ -434,7 +449,7 @@ func newDataHealthMetricShowCmd(rootCfg **config.Config, resolvedCtx *config.Con
 		},
 	}
 
-	cmd.Flags().BoolVar(&asJSON, "json", false, "Output as JSON")
+	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 	return cmd
 }
 

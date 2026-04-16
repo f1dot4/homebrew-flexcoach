@@ -46,12 +46,12 @@ func newThresholdGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *c
 				return err
 			}
 
-			if data["data"] == nil || data["data"].(map[string]interface{})["thresholds"] == nil {
+			if data["thresholds"] == nil {
 				fmt.Println("No thresholds found.")
 				return nil
 			}
 
-			thresholds := data["data"].(map[string]interface{})["thresholds"].(map[string]interface{})
+			thresholds := data["thresholds"].(map[string]interface{})
 			lastSeenDates := make(map[string]time.Time)
 			if lsd, ok := thresholds["last_seen_dates"].(map[string]interface{}); ok {
 				for k, v := range lsd {
@@ -128,8 +128,6 @@ func newThresholdGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *c
 				formatValue(thresholds["cycling_threshold_pace"], thresholds["effective_cycling_threshold_pace"], ""),
 				getHint("cycling_threshold_pace", thresholds["is_cycling_pace_learned"], thresholds["is_cycling_pace_derived"]))
 
-			// We can do it more reliably by checking the hints we actually used
-			
 			// Always show legend if metrics exist
 			fmt.Println("\nLegend:")
 			fmt.Println("  📈 = learned from history")

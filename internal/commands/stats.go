@@ -134,6 +134,10 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 				{"tsb", "TSB", "%.1f"},
 				{"vo2max_running", "VO2m Run", "%.1f"},
 				{"vo2max_cycling", "VO2m Bike", "%.1f"},
+                                {"overnight_hrv_avg", "HRV Avg", "%.0f"}, 
+                                {"training_readiness_score", "Readiness", "%.0f"}, 
+                                {"total_steps", "Steps", "%.0f"}, 
+                                {"avg_stress_sleep", "Stress Slp", "%.1f"},
 			}
 
 			type row struct {

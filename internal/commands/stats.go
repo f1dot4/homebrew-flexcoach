@@ -138,6 +138,10 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
                                 {"training_readiness_score", "Readiness", "%.0f"}, 
                                 {"total_steps", "Steps", "%.0f"}, 
                                 {"avg_stress_sleep", "Stress Slp", "%.1f"},
+                                {"avg_stress_pre_sleep_2h", "PreSlp Stress", "%.1f"},
+                                {"overnight_hrv_5min_high", "HRV 5m High", "%.0f"},
+                                {"overnight_hrv_weekly_avg", "HRV Week Avg", "%.0f"},
+                                {"hydration_ml", "Hydration ml", "%.0f"},
 			}
 
 			type row struct {

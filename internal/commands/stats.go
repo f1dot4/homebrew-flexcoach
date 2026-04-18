@@ -88,9 +88,9 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 	var days int
 
 	cmd := &cobra.Command{
-		Use:   "healthtrends",
+		Use:     "healthtrends",
 		Aliases: []string{"health"},
-		Short: "View health trends (7d vs 30d)",
+		Short:   "View health trends (7d vs 30d)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
 
@@ -127,8 +127,21 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 				{"resting_heart_rate", "RHR bpm", "%.0f"},
 				{"hrv_score", "HRV ms", "%.0f"},
 				{"body_battery", "Battery", "%.0f"},
+				{"training_readiness_score", "Readiness", "%.0f"},
+				{"total_steps", "Steps", "%.0f"},
+				{"floors_climbed", "Floors", "%.0f"},
+				{"moderate_intensity_min", "Mod.Int min", "%.0f"},
+				{"vigorous_intensity_min", "Vig.Int min", "%.0f"},
+				{"hydration_ml", "Hydration ml", "%.0f"},
 				{"sleep_quality_score", "Sleep Q", "%.0f"},
 				{"sleep_hours", "Sleep h", "%.1f"},
+				{"avg_stress_sleep", "Stress Slp", "%.1f"},
+				{"avg_stress_pre_sleep_2h", "PreSlp Stress", "%.1f"},
+				{"overnight_hrv_avg", "HRV Avg", "%.0f"},
+				{"overnight_hrv_5min_high", "HRV 5m High", "%.0f"},
+				{"overnight_hrv_weekly_avg", "HRV Week Avg", "%.0f"},
+				{"systolic_avg", "Systolic", "%.0f"},
+				{"diastolic_avg", "Diastolic", "%.0f"},
 				{"ctl", "CTL", "%.1f"},
 				{"atl", "ATL", "%.1f"},
 				{"tsb", "TSB", "%.1f"},
@@ -141,15 +154,6 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 				{"race_pred_10k_seconds", "10K Pred", "%.0fs"},
 				{"race_pred_halfmarathon_seconds", "Half Pred", "%.0fs"},
 				{"race_pred_marathon_seconds", "Mara Pred", "%.0fs"},
-				{"overnight_hrv_avg", "HRV Avg", "%.0f"}, 
- 
-                                {"training_readiness_score", "Readiness", "%.0f"}, 
-                                {"total_steps", "Steps", "%.0f"}, 
-                                {"avg_stress_sleep", "Stress Slp", "%.1f"},
-                                {"avg_stress_pre_sleep_2h", "PreSlp Stress", "%.1f"},
-                                {"overnight_hrv_5min_high", "HRV 5m High", "%.0f"},
-                                {"overnight_hrv_weekly_avg", "HRV Week Avg", "%.0f"},
-                                {"hydration_ml", "Hydration ml", "%.0f"},
 			}
 
 			type row struct {
@@ -201,10 +205,18 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 			// Calculate widths
 			wMetric, wNow, w7, w30 := 6, 3, 2, 3 // Headers
 			for _, r := range rows {
-				if len(r.label) > wMetric { wMetric = len(r.label) }
-				if len(r.now) > wNow { wNow = len(r.now) }
-				if len(r.c7) > w7 { w7 = len(r.c7) }
-				if len(r.c30) > w30 { w30 = len(r.c30) }
+				if len(r.label) > wMetric {
+					wMetric = len(r.label)
+				}
+				if len(r.now) > wNow {
+					wNow = len(r.now)
+				}
+				if len(r.c7) > w7 {
+					w7 = len(r.c7)
+				}
+				if len(r.c30) > w30 {
+					w30 = len(r.c30)
+				}
 			}
 
 			// Print table

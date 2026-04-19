@@ -109,52 +109,12 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 				return err
 			}
 
-			metrics, ok := data["metrics"].(map[string]interface{})
+			metrics, ok := data["metrics"].([]interface{})
 			if !ok {
 				return fmt.Errorf("no health trend data available")
 			}
 
 			fmt.Printf("❤️‍🩹 Health Trends (7d / 30d)\n\n")
-
-			trendTable := []struct {
-				field string
-				label string
-				fmt   string
-			}{
-				{"weight_kg", "Weight kg", "%.1f"},
-				{"body_fat_percent", "Fat %", "%.1f"},
-				{"muscle_mass_kg", "Muscle kg", "%.1f"},
-				{"resting_heart_rate", "RHR bpm", "%.0f"},
-				{"hrv_score", "HRV ms", "%.0f"},
-				{"body_battery", "Battery", "%.0f"},
-				{"training_readiness_score", "Readiness", "%.0f"},
-				{"total_steps", "Steps", "%.0f"},
-				{"floors_climbed", "Floors", "%.0f"},
-				{"moderate_intensity_min", "Mod.Int min", "%.0f"},
-				{"vigorous_intensity_min", "Vig.Int min", "%.0f"},
-				{"hydration_ml", "Hydration ml", "%.0f"},
-				{"sleep_quality_score", "Sleep Q", "%.0f"},
-				{"sleep_hours", "Sleep h", "%.1f"},
-				{"avg_stress_sleep", "Stress Slp", "%.1f"},
-				{"avg_stress_pre_sleep_2h", "PreSlp Stress", "%.1f"},
-				{"overnight_hrv_avg", "HRV Avg ms", "%.0f"},
-				{"overnight_hrv_5min_high", "HRV 5m High", "%.0f"},
-				{"overnight_hrv_weekly_avg", "HRV Week Avg", "%.0f"},
-				{"systolic_avg", "Systolic", "%.0f"},
-				{"diastolic_avg", "Diastolic", "%.0f"},
-				{"ctl", "CTL", "%.1f"},
-				{"atl", "ATL", "%.1f"},
-				{"tsb", "TSB", "%.1f"},
-				{"vo2max_running", "VO2m Run", "%.1f"},
-				{"vo2max_cycling", "VO2m Bike", "%.1f"},
-				{"endurance_score", "Endurance", "%.0f"},
-				{"hill_score", "Hill Score", "%.0f"},
-				{"fitness_age", "Fit Age", "%.0f"},
-				{"race_pred_5k_seconds", "5K Pred", "%.0fs"},
-				{"race_pred_10k_seconds", "10K Pred", "%.0fs"},
-				{"race_pred_halfmarathon_seconds", "Half Pred", "%.0fs"},
-				{"race_pred_marathon_seconds", "Mara Pred", "%.0fs"},
-			}
 
 			type row struct {
 				label string
@@ -164,17 +124,20 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 			}
 			var rows []row
 
-			for _, t := range trendTable {
-				m, ok := metrics[t.field].(map[string]interface{})
-				if !ok || m["current"] == nil {
-					continue
-				}
+			for _, entry := range metrics {
+				m := entry.(map[string]interface{})
+				label, _ := m["label"].(string)
+				goFmt, _ := m["go_fmt"].(string)
+				current := m["current"]
 
-				nowStr := fmt.Sprintf(t.fmt, m["current"])
+				nowStr := " — "
+				if current != nil {
+					nowStr = fmt.Sprintf(goFmt, current)
+				}
 
 				formatChange := func(val interface{}, ctype interface{}) string {
 					if val == nil {
-						return "—"
+						return " — "
 					}
 					v := val.(float64)
 					sign := ""
@@ -194,7 +157,7 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 				c7 := formatChange(m["change_7d"], m["change_type"])
 				c30 := formatChange(m["change_30d"], m["change_type"])
 
-				rows = append(rows, row{t.label, nowStr, c7, c30})
+				rows = append(rows, row{label, nowStr, c7, c30})
 			}
 
 			if len(rows) == 0 {

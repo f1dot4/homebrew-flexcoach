@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewSleepCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.Command {
+func NewSleepCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sleep",
 		Short: "Manage sleep logs and investigation reports",
@@ -24,7 +24,7 @@ func NewSleepCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.Com
 	return cmd
 }
 
-func NewSleepLogCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.Command {
+func NewSleepLogCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	var alcohol int
 	var caffeine string
 	var meal bool
@@ -36,7 +36,7 @@ func NewSleepLogCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.
 		Use:   "log",
 		Short: "Submit a daily sleep log",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := api.NewClient(resolvedCtx.Server, resolvedCtx.Key)
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
 
 			payload := map[string]interface{}{
 				"alcohol_units":        alcohol,
@@ -49,7 +49,7 @@ func NewSleepLogCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.
 				payload["date"] = date
 			}
 
-			resp, err := client.Post("/sleep-log", payload)
+			resp, err := client.Request("POST", "/api/sleep-log", payload)
 			if err != nil {
 				return err
 			}
@@ -69,7 +69,7 @@ func NewSleepLogCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.
 	return cmd
 }
 
-func NewSleepGetCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.Command {
+func NewSleepGetCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	var asJSON bool
 
 	cmd := &cobra.Command{
@@ -82,19 +82,23 @@ func NewSleepGetCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.
 				dateStr = args[0]
 			}
 
-			client := api.NewClient(resolvedCtx.Server, resolvedCtx.Key)
-			resp, err := client.Get(fmt.Sprintf("/sleep-log/%s", dateStr))
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+			resp, err := client.Request("GET", fmt.Sprintf("/api/sleep-log/%s", dateStr), nil)
 			if err != nil {
 				return err
 			}
 
 			if asJSON {
-				data, _ := json.MarshalIndent(resp.Data, "", "  ")
-				fmt.Println(string(data))
+				fmt.Println(string(resp.Data))
 				return nil
 			}
 
-			logData, ok := resp.Data.(map[string]interface{})["log"].(map[string]interface{})
+			var data map[string]interface{}
+			if err := json.Unmarshal(resp.Data, &data); err != nil {
+				return err
+			}
+
+			logData, ok := data["log"].(map[string]interface{})
 			if !ok || logData == nil {
 				fmt.Printf("No sleep log found for %s\n", dateStr)
 				return nil
@@ -117,7 +121,7 @@ func NewSleepGetCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.
 	return cmd
 }
 
-func NewSleepListCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.Command {
+func NewSleepListCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	var days int
 	var asJSON bool
 
@@ -125,19 +129,23 @@ func NewSleepListCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra
 		Use:   "list",
 		Short: "List recent sleep logs",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := api.NewClient(resolvedCtx.Server, resolvedCtx.Key)
-			resp, err := client.Get(fmt.Sprintf("/sleep-log?days=%d", days))
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+			resp, err := client.Request("GET", fmt.Sprintf("/api/sleep-log?days=%d", days), nil)
 			if err != nil {
 				return err
 			}
 
 			if asJSON {
-				data, _ := json.MarshalIndent(resp.Data, "", "  ")
-				fmt.Println(string(data))
+				fmt.Println(string(resp.Data))
 				return nil
 			}
 
-			logs, ok := resp.Data.(map[string]interface{})["logs"].([]interface{})
+			var data map[string]interface{}
+			if err := json.Unmarshal(resp.Data, &data); err != nil {
+				return err
+			}
+
+			logs, ok := data["logs"].([]interface{})
 			if !ok || len(logs) == 0 {
 				fmt.Println("No sleep logs found.")
 				return nil
@@ -167,26 +175,30 @@ func NewSleepListCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra
 	return cmd
 }
 
-func NewSleepReportCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cobra.Command {
+func NewSleepReportCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	var asJSON bool
 
 	cmd := &cobra.Command{
 		Use:   "report",
 		Short: "Generate a sleep investigation report",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := api.NewClient(resolvedCtx.Server, resolvedCtx.Key)
-			resp, err := client.Get("/reports/sleep-investigation")
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+			resp, err := client.Request("GET", "/api/reports/sleep-investigation", nil)
 			if err != nil {
 				return err
 			}
 
 			if asJSON {
-				data, _ := json.MarshalIndent(resp.Data, "", "  ")
-				fmt.Println(string(data))
+				fmt.Println(string(resp.Data))
 				return nil
 			}
 
-			report, ok := resp.Data.(map[string]interface{})["report"].(map[string]interface{})
+			var data map[string]interface{}
+			if err := json.Unmarshal(resp.Data, &data); err != nil {
+				return err
+			}
+
+			report, ok := data["report"].(map[string]interface{})
 			if !ok {
 				return fmt.Errorf("failed to parse report data")
 			}
@@ -199,11 +211,14 @@ func NewSleepReportCmd(rootCfg *config.Config, resolvedCtx *config.Context) *cob
 			fmt.Printf("\nREGULARITY (SRI):\n%v\n", ai["sleep_regularity_assessment"])
 			
 			fmt.Println("\nTOP DRIVERS:")
-			drivers := ai["top_drivers"].([]interface{})
-			for _, d := range drivers {
-				driver := d.(map[string]interface{})
-				fmt.Printf("  • %-15s: %-10s (Confidence: %s)\n", 
-					driver["name"], driver["direction"], driver["confidence"])
+			if drivers, ok := ai["top_drivers"].([]interface{}); ok {
+				for _, d := range drivers {
+					driver := d.(map[string]interface{})
+					fmt.Printf("  • %-15s: %-10s (Confidence: %s)\n",
+						driver["name"], driver["direction"], driver["confidence"])
+				}
+			} else {
+				fmt.Println("  No significant drivers identified yet.")
 			}
 			
 			fmt.Printf("\nSUGGESTED EXPERIMENT:\n%v\n", ai["experiment_suggestion"])

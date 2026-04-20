@@ -1531,7 +1531,7 @@ Usage:
 
 Available Commands:
   get         View current preferences
-  set         Update user preferences (flags or KEY=VALUE pairs)
+  set         Update user preferences using KEY=VALUE pairs
 
 Flags:
   -h, --help   help for preferences
@@ -1568,19 +1568,16 @@ Global Flags:
 
 ```
 Update user preferences. 
-Basic settings can be set via flags (--timezone, --plan-time, --insight-time).
-Expert settings and basic settings can also be set via KEY=VALUE positional arguments.
+Expert settings and basic settings can also be set via KEY=VALUE positional arguments. Use KEY= to reset a setting to its system default.
 Example: flexcli profile preferences set WITHINGS_SYNC_INTERVAL_HOURS=2 timezone=Europe/Vienna
+Example (reset): flexcli profile preferences set WITHINGS_SYNC_INTERVAL_HOURS=
 
 Usage:
   flexcli profile preferences set [KEY=VALUE...] [flags]
 
 Flags:
-  -h, --help                  help for set
-      --insight-time string   Weekly insight delivery time (e.g., Sunday 18:00)
-      --json                  Output in JSON format
-      --plan-time string      Daily plan delivery time (e.g., 19:30)
-      --timezone string       Timezone (e.g., Europe/Vienna)
+  -h, --help   help for set
+      --json   Output in JSON format
 
 Global Flags:
       --config string    config file (default is $HOME/.flexcli.json)

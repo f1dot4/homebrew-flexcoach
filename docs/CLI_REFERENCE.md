@@ -1598,6 +1598,7 @@ Available Commands:
   dashboard    View training dashboard
   healthtrends View health trends (7d vs 30d)
   report       View training reports
+  sleep        Manage sleep logs and investigation reports
 
 Flags:
   -h, --help   help for stats
@@ -1706,6 +1707,114 @@ Usage:
 
 Flags:
   -h, --help   help for show
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats sleep`
+
+```
+Manage sleep logs and investigation reports
+
+Usage:
+  flexcli profile stats sleep [command]
+
+Available Commands:
+  get         Get a sleep log for a specific date
+  list        List recent sleep logs
+  log         Submit a daily sleep log
+  report      Generate a sleep investigation report
+
+Flags:
+  -h, --help   help for sleep
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+
+Use "flexcli profile stats sleep [command] --help" for more information about a command.
+```
+
+### `flexcli profile stats sleep get`
+
+```
+Get a sleep log for a specific date
+
+Usage:
+  flexcli profile stats sleep get [date] [flags]
+
+Flags:
+  -h, --help   help for get
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats sleep list`
+
+```
+List recent sleep logs
+
+Usage:
+  flexcli profile stats sleep list [flags]
+
+Flags:
+  -d, --days int   Number of days to list (default 7)
+  -h, --help       help for list
+      --json       Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats sleep log`
+
+```
+Submit a daily sleep log
+
+Usage:
+  flexcli profile stats sleep log [flags]
+
+Flags:
+      --alcohol int       Alcohol units consumed
+      --caffeine string   Last caffeine bucket (before_noon, before_2pm, before_5pm, after_5pm) (default "before_noon")
+      --date string       Date (YYYY-MM-DD), defaults to today
+  -h, --help              help for log
+      --meal              Had a heavy meal after 7 PM
+      --notes string      Optional notes
+      --restedness int    Subjective restedness (1-5) (default 3)
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile stats sleep report`
+
+```
+Generate a sleep investigation report
+
+Usage:
+  flexcli profile stats sleep report [flags]
+
+Flags:
+  -h, --help   help for report
       --json   Output in JSON format
 
 Global Flags:

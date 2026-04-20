@@ -19,6 +19,7 @@ func NewStatsCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Co
 	cmd.AddCommand(newStatsDashboardCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newStatsHealthTrendsCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(NewReportCmd(rootCfg, resolvedCtx))
+	cmd.AddCommand(NewSleepCmd(rootCfg, resolvedCtx))
 
 	return cmd
 }

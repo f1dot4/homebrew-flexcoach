@@ -767,7 +767,7 @@ Available Commands:
   get         View full profile
   goal        Manage training goals
   insights    View latest AI coaching insights
-  preferences Manage user preferences (timezone, plan time, insight time)
+  preferences Manage preferences (expert settings, custom list)
   stats       View training statistics and reports
 
 Flags:
@@ -1524,14 +1524,17 @@ Global Flags:
 ### `flexcli profile preferences`
 
 ```
-Manage user preferences (timezone, plan time, insight time)
+Manage preferences (expert settings, custom list)
 
 Usage:
   flexcli profile preferences [command]
 
+Aliases:
+  preferences, pref
+
 Available Commands:
-  get         View current preferences
-  set         Update user preferences using KEY=VALUE pairs
+  custom      Manage custom training preferences (free-text list)
+  expert      Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, language, etc.)
 
 Flags:
   -h, --help   help for preferences
@@ -1545,13 +1548,120 @@ Global Flags:
 Use "flexcli profile preferences [command] --help" for more information about a command.
 ```
 
-### `flexcli profile preferences get`
+### `flexcli profile preferences custom`
+
+```
+Manage custom training preferences (free-text list)
+
+Usage:
+  flexcli profile preferences custom [command]
+
+Available Commands:
+  add         Add a new custom training preference
+  list        List custom training preferences
+  remove      Remove a custom training preference by index
+
+Flags:
+  -h, --help   help for custom
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+
+Use "flexcli profile preferences custom [command] --help" for more information about a command.
+```
+
+### `flexcli profile preferences custom add`
+
+```
+Add a new custom training preference
+
+Usage:
+  flexcli profile preferences custom add [text] [flags]
+
+Flags:
+  -h, --help   help for add
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile preferences custom list`
+
+```
+List custom training preferences
+
+Usage:
+  flexcli profile preferences custom list [flags]
+
+Flags:
+  -h, --help   help for list
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile preferences custom remove`
+
+```
+Remove a custom training preference by index
+
+Usage:
+  flexcli profile preferences custom remove [index] [flags]
+
+Flags:
+  -h, --help   help for remove
+      --json   Output in JSON format
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile preferences expert`
+
+```
+Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, language, etc.)
+
+Usage:
+  flexcli profile preferences expert [command]
+
+Available Commands:
+  get         View current preferences
+  language    Set preferred AI response language (e.g. Deutsch, Français)
+  set         Update user preferences using KEY=VALUE pairs
+
+Flags:
+  -h, --help   help for expert
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+
+Use "flexcli profile preferences expert [command] --help" for more information about a command.
+```
+
+### `flexcli profile preferences expert get`
 
 ```
 View current preferences
 
 Usage:
-  flexcli profile preferences get [flags]
+  flexcli profile preferences expert get [flags]
 
 Flags:
   -h, --help   help for get
@@ -1564,16 +1674,34 @@ Global Flags:
       --server string    FlexCoach server URL override
 ```
 
-### `flexcli profile preferences set`
+### `flexcli profile preferences expert language`
+
+```
+Set preferred AI response language (e.g. Deutsch, Français)
+
+Usage:
+  flexcli profile preferences expert language [lang] [flags]
+
+Flags:
+  -h, --help   help for language
+
+Global Flags:
+      --config string    config file (default is $HOME/.flexcli.json)
+      --context string   Use specific context from config
+      --key string       FlexCoach API key override
+      --server string    FlexCoach server URL override
+```
+
+### `flexcli profile preferences expert set`
 
 ```
 Update user preferences. 
 Expert settings and basic settings can also be set via KEY=VALUE positional arguments. Use KEY= to reset a setting to its system default.
-Example: flexcli profile preferences set WITHINGS_SYNC_INTERVAL_HOURS=2 timezone=Europe/Vienna
-Example (reset): flexcli profile preferences set WITHINGS_SYNC_INTERVAL_HOURS=
+Example: flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=2 timezone=Europe/Vienna
+Example (reset): flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=
 
 Usage:
-  flexcli profile preferences set [KEY=VALUE...] [flags]
+  flexcli profile preferences expert set [KEY=VALUE...] [flags]
 
 Flags:
   -h, --help   help for set
@@ -1728,7 +1856,7 @@ Available Commands:
   get         Get a sleep log for a specific date
   list        List recent sleep logs
   log         Submit a daily sleep log
-  report      Generate a sleep investigation report
+  report      Show today's sleep investigation report (cached), or regenerate with --force
 
 Flags:
   -h, --help   help for sleep
@@ -1808,14 +1936,15 @@ Global Flags:
 ### `flexcli profile stats sleep report`
 
 ```
-Generate a sleep investigation report
+Show today's sleep investigation report (cached), or regenerate with --force
 
 Usage:
   flexcli profile stats sleep report [flags]
 
 Flags:
-  -h, --help   help for report
-      --json   Output in JSON format
+      --force   Regenerate report even if one exists for today
+  -h, --help    help for report
+      --json    Output in JSON format
 
 Global Flags:
       --config string    config file (default is $HOME/.flexcli.json)

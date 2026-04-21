@@ -1534,7 +1534,7 @@ Aliases:
 
 Available Commands:
   custom      Manage custom training preferences (free-text list)
-  expert      Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, language, etc.)
+  expert      Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, LANGUAGE, etc.)
 
 Flags:
   -h, --help   help for preferences
@@ -1633,14 +1633,13 @@ Global Flags:
 ### `flexcli profile preferences expert`
 
 ```
-Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, language, etc.)
+Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, LANGUAGE, etc.)
 
 Usage:
   flexcli profile preferences expert [command]
 
 Available Commands:
   get         View current preferences
-  language    Set preferred AI response language
   set         Update user preferences using KEY=VALUE pairs
 
 Flags:
@@ -1674,31 +1673,12 @@ Global Flags:
       --server string    FlexCoach server URL override
 ```
 
-### `flexcli profile preferences expert language`
-
-```
-Supported: English, Deutsch, Français, Español, Italiano
-
-Usage:
-  flexcli profile preferences expert language [lang] [flags]
-
-Flags:
-  -h, --help   help for language
-      --json   Output in JSON format
-
-Global Flags:
-      --config string    config file (default is $HOME/.flexcli.json)
-      --context string   Use specific context from config
-      --key string       FlexCoach API key override
-      --server string    FlexCoach server URL override
-```
-
 ### `flexcli profile preferences expert set`
 
 ```
 Update user preferences. 
 Expert settings and basic settings can also be set via KEY=VALUE positional arguments. Use KEY= to reset a setting to its system default.
-Example: flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=2 timezone=Europe/Vienna
+Example: flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=2 LANGUAGE=Deutsch timezone=Europe/Vienna
 Example (reset): flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=
 
 Usage:

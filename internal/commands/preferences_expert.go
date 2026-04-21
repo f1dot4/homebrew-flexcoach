@@ -15,12 +15,11 @@ import (
 func newPreferencesExpertCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "expert",
-		Short: "Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, language, etc.)",
+		Short: "Manage expert settings (SLEEP_LOG_ENABLED, sync intervals, LANGUAGE, etc.)",
 	}
 
 	cmd.AddCommand(newPreferencesExpertGetCmd(rootCfg, resolvedCtx))
 	cmd.AddCommand(newPreferencesExpertSetCmd(rootCfg, resolvedCtx))
-	cmd.AddCommand(newPreferencesLanguageCmd(rootCfg, resolvedCtx))
 
 	return cmd
 }
@@ -71,7 +70,7 @@ func newPreferencesExpertSetCmd(rootCfg **config.Config, resolvedCtx *config.Con
 		Short: "Update user preferences using KEY=VALUE pairs",
 		Long: `Update user preferences. 
 Expert settings and basic settings can also be set via KEY=VALUE positional arguments. Use KEY= to reset a setting to its system default.
-Example: flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=2 timezone=Europe/Vienna
+Example: flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=2 LANGUAGE=Deutsch timezone=Europe/Vienna
 Example (reset): flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_HOURS=`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
@@ -108,32 +107,5 @@ Example (reset): flexcli profile preferences expert set WITHINGS_SYNC_INTERVAL_H
 
 	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 
-	return cmd
-}
-
-func newPreferencesLanguageCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
-	var asJSON bool
-	cmd := &cobra.Command{
-		Use:   "language [lang]",
-		Short: "Set preferred AI response language",
-		Long:  "Supported: English, Deutsch, Français, Español, Italiano",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
-			resp, err := client.Request("POST", "/api/profile/preferences", map[string]interface{}{
-				"language": args[0],
-			})
-			if err != nil {
-				return err
-			}
-			if asJSON {
-				fmt.Printf("{\"success\": true, \"message\": \"%s\"}\n", resp.Message)
-				return nil
-			}
-			fmt.Printf("✅ AI language set to %s\n", args[0])
-			return nil
-		},
-	}
-	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 	return cmd
 }

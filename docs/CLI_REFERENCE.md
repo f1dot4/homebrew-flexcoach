@@ -1102,7 +1102,7 @@ Global Flags:
 Download an activity's original FIT file from Garmin Connect
 
 Usage:
-  flexcli profile data activity download <activity_id> [flags]
+  flexcli profile data activity download [activity_id] [flags]
 
 Flags:
   -h, --help            help for download

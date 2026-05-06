@@ -1060,10 +1060,10 @@ Aliases:
   activity, act
 
 Available Commands:
-  delete      Delete an activity from Garmin Connect (currently disabled)
-  download    Download an activity's original FIT file from Garmin Connect
+  delete      Delete an activity from Garmin Connect (defaults to 'latest', currently disabled)
+  download    Download an activity's original FIT file from Garmin Connect (defaults to 'latest')
   list        List synced activities with their Garmin activity IDs
-  rename      Rename an activity in Garmin Connect
+  rename      Rename an activity in Garmin Connect (defaults to 'latest')
   upload      Upload a FIT/GPX/TCX file to Garmin Connect
 
 Flags:
@@ -1081,10 +1081,10 @@ Use "flexcli profile data activity [command] --help" for more information about 
 ### `flexcli profile data activity delete`
 
 ```
-Delete an activity from Garmin Connect (currently disabled)
+Delete an activity from Garmin Connect (defaults to 'latest', currently disabled)
 
 Usage:
-  flexcli profile data activity delete <activity_id> [flags]
+  flexcli profile data activity delete [activity_id] [flags]
 
 Flags:
   -h, --help   help for delete
@@ -1099,7 +1099,7 @@ Global Flags:
 ### `flexcli profile data activity download`
 
 ```
-Download an activity's original FIT file from Garmin Connect
+Download an activity's original FIT file from Garmin Connect (defaults to 'latest')
 
 Usage:
   flexcli profile data activity download [activity_id] [flags]
@@ -1139,10 +1139,10 @@ Global Flags:
 ### `flexcli profile data activity rename`
 
 ```
-Rename an activity in Garmin Connect
+Rename an activity in Garmin Connect (defaults to 'latest')
 
 Usage:
-  flexcli profile data activity rename <activity_id> <title> [flags]
+  flexcli profile data activity rename <title> [activity_id] [flags]
 
 Flags:
   -h, --help   help for rename

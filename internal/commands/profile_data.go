@@ -297,34 +297,36 @@ func newDataActivityListCmd(rootCfg **config.Config, resolvedCtx *config.Context
 }
 
 func newDataActivityDownloadCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
-	var output string
+        var output string
 
-	cmd := &cobra.Command{
-		Use:   "download <activity_id>",
-		Short: "Download an activity's original FIT file from Garmin Connect",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			activityID := args[0]
-			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+        cmd := &cobra.Command{
+                Use:   "download [activity_id]",
+                Short: "Download an activity's original FIT file from Garmin Connect",
+                Args:  cobra.MaximumNArgs(1),
+                RunE: func(cmd *cobra.Command, args []string) error {
+                        activityID := "latest"
+                        if len(args) > 0 {
+                                activityID = args[0]
+                        }
+                        client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
 
-			if output == "" {
-				output = activityID + ".zip"
-			}
+                        if output == "" {
+                                output = activityID + ".zip"
+                        }
 
-			path := fmt.Sprintf("/api/activity/%s/download", activityID)
-			if err := client.DownloadFile(path, output); err != nil {
-				return fmt.Errorf("download failed: %w", err)
-			}
+                        path := fmt.Sprintf("/api/activity/%s/download", activityID)
+                        if err := client.DownloadFile(path, output); err != nil {
+                                return fmt.Errorf("download failed: %w", err)
+                        }
 
-			fmt.Printf("Downloaded activity %s to %s\n", activityID, output)
-			return nil
-		},
-	}
+                        fmt.Printf("Downloaded activity %s to %s\n", activityID, output)
+                        return nil
+                },
+        }
 
-	cmd.Flags().StringVarP(&output, "output", "o", "", "Output file path (default: <activity_id>.zip)")
-	return cmd
+        cmd.Flags().StringVarP(&output, "output", "o", "", "Output file path (default: <activity_id>.zip)")
+        return cmd
 }
-
 func newDataActivityUploadCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	return &cobra.Command{
 		Use:   "upload <file>",

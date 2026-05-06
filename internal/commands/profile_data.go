@@ -301,7 +301,7 @@ func newDataActivityDownloadCmd(rootCfg **config.Config, resolvedCtx *config.Con
 
         cmd := &cobra.Command{
                 Use:   "download [activity_id]",
-                Short: "Download an activity's original FIT file from Garmin Connect",
+                Short: "Download an activity's original FIT file from Garmin Connect (defaults to 'latest')",
                 Args:  cobra.MaximumNArgs(1),
                 RunE: func(cmd *cobra.Command, args []string) error {
                         activityID := "latest"
@@ -360,18 +360,17 @@ func newDataActivityUploadCmd(rootCfg **config.Config, resolvedCtx *config.Conte
 }
 
 func newDataActivityDeleteCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
-	return &cobra.Command{
-		Use:   "delete <activity_id>",
-		Short: "Delete an activity from Garmin Connect (currently disabled)",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Activity deletion is currently not implemented due to safety reasons.")
-			fmt.Println("Please delete activities manually via Garmin Connect.")
-			return nil
-		},
-	}
+        return &cobra.Command{
+                Use:   "delete [activity_id]",
+                Short: "Delete an activity from Garmin Connect (defaults to 'latest', currently disabled)",
+                Args:  cobra.MaximumNArgs(1),
+                RunE: func(cmd *cobra.Command, args []string) error {
+                        fmt.Println("Activity deletion is currently not implemented due to safety reasons.")
+                        fmt.Println("Please delete activities manually via Garmin Connect.")
+                        return nil
+                },
+        }
 }
-
 // ---------------------------------------------------------------------------
 // data healthmetric (alias: hm)
 // ---------------------------------------------------------------------------
@@ -546,32 +545,35 @@ func newDataHealthMetricDeleteCmd(rootCfg **config.Config, resolvedCtx *config.C
 }
 
 func newDataActivityRenameCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
-	return &cobra.Command{
-		Use:   "rename <activity_id> <title>",
-		Short: "Rename an activity in Garmin Connect",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			activityID := args[0]
-			title := args[1]
+        return &cobra.Command{
+                Use:   "rename <title> [activity_id]",
+                Short: "Rename an activity in Garmin Connect (defaults to 'latest')",
+                Args:  cobra.RangeArgs(1, 2),
+                RunE: func(cmd *cobra.Command, args []string) error {
+                        title := args[0]
+                        activityID := "latest"
+                        if len(args) > 1 {
+                                activityID = args[1]
+                        }
 
-			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+                        client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
 
-			body := map[string]string{
-				"name": title,
-			}
+                        body := map[string]string{
+                                "name": title,
+                        }
 
-			path := fmt.Sprintf("/api/activity/%s/name", activityID)
-			resp, err := client.Request("PUT", path, body)
-			if err != nil {
-				return fmt.Errorf("rename failed: %w", err)
-			}
+                        path := fmt.Sprintf("/api/activity/%s/name", activityID)
+                        resp, err := client.Request("PUT", path, body)
+                        if err != nil {
+                                return fmt.Errorf("rename failed: %w", err)
+                        }
 
-			if resp.Success {
-				fmt.Printf("✅ Activity %s renamed to: %s\n", activityID, title)
-			} else {
-				fmt.Printf("❌ Rename failed: %s\n", resp.Message)
-			}
-			return nil
-		},
-	}
+                        if resp.Success {
+                                fmt.Printf("✅ Activity %s renamed to: %s\n", activityID, title)
+                        } else {
+                                fmt.Printf("❌ Rename failed: %s\n", resp.Message)
+                        }
+                        return nil
+                },
+        }
 }

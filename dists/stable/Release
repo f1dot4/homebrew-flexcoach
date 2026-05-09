@@ -1,0 +1,14 @@
+Origin: flexcli
+Label: flexcli
+Suite: stable
+Codename: stable
+Architectures: amd64
+Components: main
+Description: FlexCLI apt repository
+Date: Sat, 09 May 2026 17:42:51 UTC
+MD5Sum:
+ 7feacbaa24e4cee0381cedc5e2e35953 647 main/binary-amd64/Packages
+ e0d98b38efcaa24957f86e4353aed627 473 main/binary-amd64/Packages.gz
+SHA256:
+ d4194c9630bc4ab05ee1349cc224cb604f552eaa545c336923b2bcb22bae8de3 647 main/binary-amd64/Packages
+ 4ebe03772849e42b9efd9de872ec01576d7483807707b2c818d49cd64e1903e2 473 main/binary-amd64/Packages.gz

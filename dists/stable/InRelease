@@ -1,0 +1,34 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Origin: flexcli
+Label: flexcli
+Suite: stable
+Codename: stable
+Architectures: amd64
+Components: main
+Description: FlexCLI apt repository
+Date: Sat, 09 May 2026 17:42:51 UTC
+MD5Sum:
+ 7feacbaa24e4cee0381cedc5e2e35953 647 main/binary-amd64/Packages
+ e0d98b38efcaa24957f86e4353aed627 473 main/binary-amd64/Packages.gz
+SHA256:
+ d4194c9630bc4ab05ee1349cc224cb604f552eaa545c336923b2bcb22bae8de3 647 main/binary-amd64/Packages
+ 4ebe03772849e42b9efd9de872ec01576d7483807707b2c818d49cd64e1903e2 473 main/binary-amd64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iQJPBAEBCAA5FiEEOlCCEdUk2VcLbMypMAW9JVwwbE4FAmn/chsbFIAAAAAABAAO
+bWFudTIsMi41KzEuMTIsMCwzAAoJEDAFvSVcMGxO1nwP+gOJwLXdbwp4SXIHFcK6
+BuzPAiy5aUWYWed5ZlHUIVraH5VPDCDdOij2S6kh5qtZQuRBkLLPziO4H31WKM3D
+sJ7ba5EYZW1VfuUmPwO+Ey4yo4NMNl00Z/rOX4YRMRHVSaJ68wZ40DpmYE4ZjTFq
+GVJ2YBvireiFfediQPJcwwiQ3djhtE6GwKyITzCnLZHXJ468EIWKQ2h5iH69+b1a
+GNjANTYKDOf04Mo+PTzrM9tfSvQvx9b3it6PIQTuruXx7gNwY/bSRh++Fs3oYLEK
+JsXR2V5PMXXUvzL8I0oyzbHGmlRUbsZpbLTB2pWNKlp6HrjA40tBuSUvN7F6oxDQ
+EiHo4DV+oOGgizzC+bAw/58Ew7Q77P7kepE42LY69f3cIyOprFINbJpzO0N/AvoG
+9zg5yoIy/WiT5E4nH14I7FyruuWz8wVRaCXrauIe0EHUKrE2JMTAn7tZLLeFPuAy
+TMeOE6l2TmK/dInEQ2bliJ7diFgty0IKuszDk4gITIgTI6SC9gmdxClWkKKzx8E9
+UTPD7KvsQIJ/o+0CCR92G64G6MI7nY9WmUgwems14Dswm7sCOz7d7tGZAxygQ+m/
+d+nPq3ojdbhwHRU76JYddLSegmXUsXkbH8lBz+6HZzzQQUN19JIABLywAcvvI6lY
+4iPIc7TQNy++FUJJkwvztNYS
+=8Vr5
+-----END PGP SIGNATURE-----

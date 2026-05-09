@@ -1,5 +1,10 @@
 FROM alpine:3.21
 
+LABEL org.opencontainers.image.title="flexcli" \
+      org.opencontainers.image.description="FlexCLI sidecar — downloads activities from the FlexCoach platform and places them into a Dawarich watched directory for automatic import. Runs on a configurable cron schedule." \
+      org.opencontainers.image.source="https://github.com/f1dot4/homebrew-flexcli" \
+      org.opencontainers.image.licenses="MIT"
+
 RUN apk add --no-cache unzip tzdata
 
 COPY bin/flexcli-linux /usr/local/bin/flexcli

@@ -34,6 +34,58 @@ echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/flexcli.gpg] https://f1dot4.gi
 sudo apt update && sudo apt install flexcli
 ```
 
+### Docker
+
+```bash
+docker run --rm \
+  -e FLEXCLI_SERVER=https://flexcoach.example.com \
+  -e FLEXCLI_API_KEY=YOUR_API_KEY \
+  ghcr.io/f1dot4/flexcli:latest \
+  flexcli profile data activity list
+```
+
+#### Dawarich integration
+
+Run as a sidecar to automatically import activities into [Dawarich](https://dawarich.app) every 2 hours. Files are placed in the Dawarich watched directory under your user's email subdirectory:
+
+```yaml
+flexcli:
+  image: ghcr.io/f1dot4/flexcli:latest
+  volumes:
+    - /opt/dawarich/watched:/watched
+  environment:
+    FLEXCLI_API_KEY: ${FLEXCLI_API_KEY}
+    FLEXCLI_SERVER: https://flexcoach.example.com
+    FLEXCLI_FORMAT: gpx
+    FLEXCLI_DAWARICH_USER: your@email.com
+    FLEXCLI_IMPORT_SCHEDULE: "0 */2 * * *"
+  restart: always
+```
+
+#### Bulk historical import
+
+To import all activities for a given year into Dawarich:
+
+```bash
+docker exec -e YEAR=2025 flexcli sh -c '
+  flexcli \
+    --server "$FLEXCLI_SERVER" \
+    --key "$FLEXCLI_API_KEY" \
+    profile data activity download-bulk \
+    --format gpx \
+    --year "$YEAR" \
+    --output /tmp/$YEAR-all.zip \
+  && unzip -o /tmp/$YEAR-all.zip -d /watched/your@email.com/ \
+  && rm /tmp/$YEAR-all.zip
+'
+```
+
+Then trigger the Dawarich watcher to pick up the files:
+
+```bash
+docker exec dawarich_app bin/rails runner 'Imports::Watcher.new.call'
+```
+
 ### From Source
 
 Ensure you have Go 1.22+ installed.

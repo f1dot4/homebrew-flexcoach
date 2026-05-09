@@ -6,8 +6,10 @@ set -e
 YEAR=$(date +%Y)
 MONTH=$(date +%-m)
 DAY=$(date +%-d)
-FORMAT="${FLEXCLI_FORMAT:-fit}"
-WATCHED="${FLEXCLI_WATCHED_DIR:-/watched}"
+FORMAT="${FLEXCLI_FORMAT:-gpx}"
+DAWARICH_USER="${FLEXCLI_DAWARICH_USER:?FLEXCLI_DAWARICH_USER env var is required}"
+WATCHED="${FLEXCLI_WATCHED_DIR:-/watched}/${DAWARICH_USER}"
+mkdir -p "$WATCHED"
 
 tmpzip="/tmp/activities-$$-$(date +%s)"
 
@@ -23,6 +25,7 @@ if flexcli \
     --output "$tmpzip"; then
   echo "[$(date)] Extracting to $WATCHED..."
   unzip -o "$tmpzip" -d "$WATCHED/"
+  chmod 644 "$WATCHED"/*.gpx 2>/dev/null || true
   echo "[$(date)] Done."
 else
   echo "[$(date)] No activities found for $YEAR/$MONTH/$DAY, skipping."

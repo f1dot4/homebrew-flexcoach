@@ -12,10 +12,25 @@ FlexCLI is a Go-based command-line interface for the FlexCoach AI fitness platfo
 
 ## Installation
 
-### Homebrew (Recommended)
+### Homebrew (macOS)
 
 ```bash
 brew install f1dot4/flexcli/flexcli
+```
+
+### apt (Debian / Ubuntu)
+
+```bash
+# Add the GPG key
+curl -fsSL https://f1dot4.github.io/homebrew-flexcli/flexcli.gpg \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/flexcli.gpg
+
+# Add the repository
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/flexcli.gpg] https://f1dot4.github.io/homebrew-flexcli stable main" \
+  | sudo tee /etc/apt/sources.list.d/flexcli.list
+
+# Install
+sudo apt update && sudo apt install flexcli
 ```
 
 ### From Source
@@ -58,26 +73,31 @@ flexcli status
 make build
 ```
 
-### Releasing
-The release process is fully automated via the `Makefile`. A single command handles testing, cross-compilation, documentation generation, version bumping, and git tagging:
+### One-time setup (apt signing key)
+
+Before your first release, generate a GPG key for signing the apt repository:
 
 ```bash
-make release v=0.1.7
+make setup-apt
+# Note the long key ID printed (e.g. ABCD1234EFGH5678)
 ```
+
+### Releasing
+
+```bash
+GPG_KEY_ID=<your-key-id> make release v=0.1.7
+```
+
+Requires [`nfpm`](https://nfpm.goreleaser.com/) (`brew install goreleaser/tap/nfpm`) and `gpg`.
 
 **What this does:**
-1. Runs all Go tests (`make test`).
-2. Updates version strings in `main.go`.
-3. Updates the Homebrew formula (`Formula/flexcli.rb`) with the new version and tag URL.
-4. Cross-compiles binaries for macOS and Linux (`make build`).
-5. Re-generates the full CLI reference documentation (`make docs`).
-6. Calculates the SHA256 of the new release and updates the formula.
-7. Commits all changes and creates a local Git tag (`v0.1.7`).
+1. Runs all Go tests.
+2. Updates version strings in `main.go` and the Homebrew formula.
+3. Cross-compiles binaries for macOS and Linux.
+4. Re-generates the full CLI reference documentation.
+5. Builds a signed `.deb` package via `nfpm`.
+6. Commits, tags, and pushes to GitHub.
+7. Fetches the real SHA256 of the GitHub-generated tarball and updates the formula.
+8. Publishes the `.deb` to the `gh-pages` apt repository (signed with your GPG key).
 
-**Finalizing the release:**
-After running `make release`, push the changes and the tag to GitHub:
-```bash
-git push origin main
-git push origin v0.1.7
-```
-Once the tag is pushed, Homebrew users can upgrade via `brew upgrade flexcli`.
+Once complete, both `brew upgrade flexcli` and `apt upgrade flexcli` work immediately.

@@ -340,6 +340,7 @@ func newDataActivityDownloadBulkCmd(rootCfg **config.Config, resolvedCtx *config
 	var format string
 	var year int
 	var month int
+	var day int
 
 	cmd := &cobra.Command{
 		Use:   "download-bulk",
@@ -354,6 +355,9 @@ func newDataActivityDownloadBulkCmd(rootCfg **config.Config, resolvedCtx *config
 			path := fmt.Sprintf("/api/activity/download/bulk/prepare?year=%d&format=%s", year, format)
 			if month > 0 {
 				path += fmt.Sprintf("&month=%d", month)
+			}
+			if day > 0 {
+				path += fmt.Sprintf("&day=%d", day)
 			}
 
 			events, err := client.GetSSE(path)
@@ -396,6 +400,9 @@ func newDataActivityDownloadBulkCmd(rootCfg **config.Config, resolvedCtx *config
 				output = fmt.Sprintf("activities_%d.zip", year)
 				if month > 0 {
 					output = fmt.Sprintf("activities_%d_%02d.zip", year, month)
+					if day > 0 {
+						output = fmt.Sprintf("activities_%d_%02d_%02d.zip", year, month, day)
+					}
 				}
 			}
 
@@ -412,6 +419,7 @@ func newDataActivityDownloadBulkCmd(rootCfg **config.Config, resolvedCtx *config
 
 	cmd.Flags().IntVarP(&year, "year", "y", 0, "Year to download activities for (required)")
 	cmd.Flags().IntVarP(&month, "month", "m", 0, "Month to download (1-12, optional)")
+	cmd.Flags().IntVarP(&day, "day", "d", 0, "Day to download (1-31, optional)")
 	cmd.Flags().StringVarP(&output, "output", "o", "", "Output ZIP file path")
 	cmd.Flags().StringVarP(&format, "format", "f", "fit", "File format (fit, gpx, tcx, csv, kml)")
 

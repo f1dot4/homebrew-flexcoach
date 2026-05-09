@@ -1,0 +1,19 @@
+name: "flexcli"
+arch: "amd64"
+platform: "linux"
+version: "${VERSION}"
+section: "utils"
+priority: "optional"
+maintainer: "Lukas Leidinger <lukas.leidinger@willhaben.at>"
+description: |
+  FlexCLI - Management CLI for FlexCoach AI fitness platform.
+  Allows users and developers to interact with the backend API to manage
+  profiles, training plans, goals, and system status.
+homepage: "https://github.com/f1dot4/homebrew-flexcli"
+license: "MIT"
+
+contents:
+  - src: ./bin/flexcli-linux
+    dst: /usr/local/bin/flexcli
+    file_info:
+      mode: 0755

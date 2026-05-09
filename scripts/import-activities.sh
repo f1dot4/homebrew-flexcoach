@@ -5,36 +5,24 @@ set -e
 
 YEAR=$(date +%Y)
 MONTH=$(date +%-m)
+DAY=$(date +%-d)
 FORMAT="${FLEXCLI_FORMAT:-gpx}"
 WATCHED="${FLEXCLI_WATCHED_DIR:-/watched}"
 
-download_and_extract() {
-  local year=$1
-  local month=$2
-  local tmpzip
-  tmpzip=$(mktemp /tmp/activities-XXXXXX)
+tmpzip=$(mktemp /tmp/activities-XXXXXX)
 
-  echo "[$(date)] Downloading $year/$month (format: $FORMAT)..."
-  if flexcli profile data activity download-bulk \
-      --format "$FORMAT" \
-      --year "$year" \
-      --month "$month" \
-      --output "$tmpzip"; then
-    echo "[$(date)] Extracting to $WATCHED..."
-    unzip -o "$tmpzip" -d "$WATCHED/"
-    echo "[$(date)] Done for $year/$month."
-  else
-    echo "[$(date)] No activities found for $year/$month, skipping."
-  fi
-
-  rm -f "$tmpzip"
-}
-
-download_and_extract "$YEAR" "$MONTH"
-
-# On the 1st of the month also pull previous month to catch late syncs
-if [ "$(date +%-d)" = "1" ]; then
-  PREV_YEAR=$(date -d "last month" +%Y 2>/dev/null || date -v-1m +%Y)
-  PREV_MONTH=$(date -d "last month" +%-m 2>/dev/null || date -v-1m +%-m)
-  download_and_extract "$PREV_YEAR" "$PREV_MONTH"
+echo "[$(date)] Downloading $YEAR/$MONTH/$DAY (format: $FORMAT)..."
+if flexcli profile data activity download-bulk \
+    --format "$FORMAT" \
+    --year "$YEAR" \
+    --month "$MONTH" \
+    --day "$DAY" \
+    --output "$tmpzip"; then
+  echo "[$(date)] Extracting to $WATCHED..."
+  unzip -o "$tmpzip" -d "$WATCHED/"
+  echo "[$(date)] Done."
+else
+  echo "[$(date)] No activities found for $YEAR/$MONTH/$DAY, skipping."
 fi
+
+rm -f "$tmpzip"

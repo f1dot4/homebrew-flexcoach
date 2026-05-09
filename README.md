@@ -7,6 +7,7 @@ FlexCLI is a Go-based command-line interface for the FlexCoach AI fitness platfo
 - **Profile Management**: View and update user profile, body vitals, and preferences.
 - **Training Plans**: Retrieve, update, or skip daily training plans.
 - **Goal & Constraint Tracking**: Manage structured training goals and user constraints.
+- **Activity Management**: Download individual activities or perform bulk exports (FIT, GPX, TCX, CSV, KML).
 - **Device Connections**: Monitor and sync Garmin, Withings, and Rouvy data.
 - **System Status**: Check backend health and service connectivity.
 
@@ -57,6 +58,12 @@ Or configure a persistent context:
 flexcli config --server https://flexcoach.example.com --key YOUR_API_KEY --name production
 flexcli context use production
 flexcli status
+
+# Download your latest activity as GPX
+flexcli profile data activity download --format gpx
+
+# Bulk download activities for a specific month
+flexcli profile data activity download-bulk --year 2026 --month 4
 ```
 
 ## Global Flags

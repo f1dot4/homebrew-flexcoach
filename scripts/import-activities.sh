@@ -6,7 +6,7 @@ set -e
 YEAR=$(date +%Y)
 MONTH=$(date +%-m)
 DAY=$(date +%-d)
-FORMAT="${FLEXCLI_FORMAT:-gpx}"
+FORMAT="${FLEXCLI_FORMAT:-fit}"
 WATCHED="${FLEXCLI_WATCHED_DIR:-/watched}"
 
 tmpzip="/tmp/activities-$$-$(date +%s)"

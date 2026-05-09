@@ -9,7 +9,7 @@ DAY=$(date +%-d)
 FORMAT="${FLEXCLI_FORMAT:-gpx}"
 WATCHED="${FLEXCLI_WATCHED_DIR:-/watched}"
 
-tmpzip=$(mktemp /tmp/activities-XXXXXX)
+tmpzip="/tmp/activities-$$-$(date +%s)"
 
 echo "[$(date)] Downloading $YEAR/$MONTH/$DAY (format: $FORMAT)..."
 if flexcli \

@@ -88,6 +88,7 @@ func newStatsDashboardCmd(rootCfg **config.Config, resolvedCtx *config.Context) 
 func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
 	var asJSON bool
 	var days int
+	var force bool
 
 	cmd := &cobra.Command{
 		Use:     "healthtrends",
@@ -96,7 +97,12 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
 
-			resp, err := client.Request("GET", fmt.Sprintf("/api/profile/health-trends?days=%d", days), nil)
+			path := fmt.Sprintf("/api/profile/health-trends?days=%d", days)
+			if force {
+				path += "&force=true"
+			}
+
+			resp, err := client.Request("GET", path, nil)
 			if err != nil {
 				return err
 			}
@@ -212,6 +218,7 @@ func newStatsHealthTrendsCmd(rootCfg **config.Config, resolvedCtx *config.Contex
 
 	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
 	cmd.Flags().IntVarP(&days, "days", "d", 30, "Lookback days for trend analysis")
+	cmd.Flags().BoolVar(&force, "force", false, "Force regeneration of health analysis")
 
 	return cmd
 }

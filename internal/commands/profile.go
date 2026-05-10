@@ -330,16 +330,62 @@ func newProfileInsightsCoachCmd(rootCfg **config.Config, resolvedCtx *config.Con
 }
 
 func newProfileInsightsDocCmd(rootCfg **config.Config, resolvedCtx *config.Context) *cobra.Command {
+	var asJSON bool
+	var force bool
+
 	cmd := &cobra.Command{
 		Use:     "doc",
 		Aliases: []string{"health"},
 		Short:   "View latest health analysis from 'The Doc'",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Doc analysis is now part of health-trends
-			healthCmd := newStatsHealthTrendsCmd(rootCfg, resolvedCtx)
-			return healthCmd.RunE(cmd, args)
+			client := api.NewClient(resolvedCtx.ServerURL, resolvedCtx.APIKey)
+
+			path := "/api/profile/health-trends"
+			if force {
+				path += "?force=true"
+			}
+
+			// We reuse the health-trends endpoint which now includes Doc analysis
+			resp, err := client.Request("GET", path, nil)
+			if err != nil {
+				return err
+			}
+
+			if asJSON {
+				fmt.Println(string(resp.Data))
+				return nil
+			}
+
+			var data map[string]interface{}
+			if err := json.Unmarshal(resp.Data, &data); err != nil {
+				return err
+			}
+
+			analysis, ok := data["health_analysis"].(string)
+			if !ok || analysis == "" {
+				fmt.Println("No recent health analysis available.")
+				return nil
+			}
+
+			fmt.Println("🩺 The Doc's Analysis")
+
+			if analysisAt, ok := data["health_analysis_at"].(string); ok {
+				if t, err := time.Parse(time.RFC3339, analysisAt); err == nil {
+					fmt.Printf("   (Cached from %s)\n", t.Format("2006-01-02 15:04"))
+				} else {
+					fmt.Printf("   (Cached from %s)\n", analysisAt)
+				}
+			}
+
+			fmt.Println()
+			fmt.Println(analysis)
+
+			return nil
 		},
 	}
+
+	cmd.Flags().BoolVar(&asJSON, "json", false, "Output in JSON format")
+	cmd.Flags().BoolVar(&force, "force", false, "Force regeneration of health analysis")
 
 	return cmd
 }

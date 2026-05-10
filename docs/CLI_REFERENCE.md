@@ -1583,7 +1583,9 @@ Aliases:
   doc, health
 
 Flags:
-  -h, --help   help for doc
+      --force   Force regeneration of health analysis
+  -h, --help    help for doc
+      --json    Output in JSON format
 
 Global Flags:
       --config string    config file (default is $HOME/.flexcli.json)
@@ -1844,6 +1846,7 @@ Aliases:
 
 Flags:
   -d, --days int   Lookback days for trend analysis (default 30)
+      --force      Force regeneration of health analysis
   -h, --help       help for healthtrends
       --json       Output in JSON format
 
